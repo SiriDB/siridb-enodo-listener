@@ -2,7 +2,6 @@ import asyncio
 import configparser
 import datetime
 import json
-import os
 
 from lib.siridb.pipeserver import PipeServer
 from lib.socket.client import Client
@@ -11,14 +10,14 @@ from lib.socket.package import *
 
 class Listener:
 
-    def __init__(self, loop):
+    def __init__(self, loop, config_path):
         self._loop = loop
         self._config = configparser.ConfigParser()
-        self._config.read(os.path.join(os.path.dirname(__file__), 'listener.conf'))
+        self._config.read(config_path)
         self._series_to_watch = ()
         self._serie_counter_updates = {}
         self._client = Client(loop, self._config['enodo']['hub_hostname'], int(self._config['enodo']['hub_port']),
-                              heartbeat_interval=int(self._config['enodo']['heartbeat_interval']))
+                              'listener', heartbeat_interval=int(self._config['enodo']['heartbeat_interval']))
         self._client_run_task = None
         self._updater_task = None
         self._last_update = datetime.datetime.now()
@@ -46,7 +45,7 @@ class Listener:
             if serie_name in self._series_to_watch:
                 if serie_name in self._serie_counter_updates:
                     serie_counter = self._serie_counter_updates.get(serie_name)
-                    serie_counter += len(values)
+                    self._serie_counter_updates[serie_name] = serie_counter + len(values)
                 else:
                     self._serie_counter_updates[serie_name] = len(values)
 
@@ -74,6 +73,7 @@ class Listener:
         self._updater_task = self._loop.create_task(self._updater())
 
     async def _handle_update_series(self, data):
+        print("Received new list of series to watch")
         self._series_to_watch = set(json.loads(data))
 
     def close(self):
