@@ -22,5 +22,8 @@ class PipeServer(SiriDBAsyncConnection):
         """
         series names are returned as c strings (0 terminated)
         """
-        data = {k.rstrip('\x00'): v for k, v in data.items()}
-        self._on_data_cb(data)
+        try:
+            data = {k.rstrip('\x00'): v for k, v in data.items()}
+            self._on_data_cb(data)
+        except Exception as _:
+            pass

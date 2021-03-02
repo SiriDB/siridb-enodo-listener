@@ -1,22 +1,26 @@
 import asyncio
 import configparser
 import datetime
+import os
 
 from lib.siridb.pipeserver import PipeServer
+from lib.config import EnodoConfigParser
 from enodo.client import Client
-from enodo.client.package import *
+from enodo.protocol.package import *
 
 
 class Listener:
 
     def __init__(self, loop, config_path):
         self._loop = loop
-        self._config = configparser.ConfigParser()
-        self._config.read(config_path)
+        self._config = EnodoConfigParser()
+        if config_path is not None and os.path.exists(config_path):
+            self._config.read(config_path)
         self._series_to_watch = ()
         self._serie_updates = {}
         self._client = Client(loop, self._config['enodo']['hub_hostname'], int(self._config['enodo']['hub_port']),
-                              'listener', self._config['enodo']['token'], heartbeat_interval=int(self._config['enodo']['heartbeat_interval']))
+                              'listener', self._config['enodo']['internal_security_token'], 
+                              heartbeat_interval=int(self._config['enodo']['heartbeat_interval']), identity_file_path=".enodo_id")
         self._client_run_task = None
         self._updater_task = None
         self._last_update = datetime.datetime.now()
@@ -42,7 +46,6 @@ class Listener:
         print("INCOMMING DATA")
         for serie_name, values in data.items():
             if serie_name in self._series_to_watch:
-                print("h2")
                 if serie_name in self._serie_updates:
                     self._serie_updates[serie_name].extend(values)
                 else:
