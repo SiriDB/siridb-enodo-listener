@@ -2,3 +2,6 @@
 listener_local.conf
 listener_docker.conf
 *.pyc
+.vscode
+.enodo_id
+test
