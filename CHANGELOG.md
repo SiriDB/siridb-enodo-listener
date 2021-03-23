@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  
 ## [Unreleased] - yyyy-mm-dd
  
+### Changed
+- Arguments underscore to dash
  
 ## [0.1.0-beta2.0] - 2021-03-04
   
