@@ -3,6 +3,7 @@ package main
 type SeriesConfig struct {
 	Name       string
 	IsRealtime bool
+	IsGroup    bool
 }
 
 type SeriesToWatch interface {

@@ -99,8 +99,9 @@ func watchIncommingData() {
 					}
 					name, okName := unboxed["name"].(string)
 					isRealtime, okIsRealtime := unboxed["realtime"].(bool)
-					if okName && okIsRealtime {
-						sc := SeriesConfig{name, isRealtime}
+					isGroup, okIsGroup := unboxed["isGroup"].(bool)
+					if okName && okIsRealtime && okIsGroup {
+						sc := SeriesConfig{name, isRealtime, isGroup}
 						seriesToWatch[name] = sc
 					}
 				}

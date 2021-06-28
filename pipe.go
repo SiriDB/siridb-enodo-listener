@@ -58,11 +58,11 @@ func readFromPipe() {
 			for key, element := range unboxed {
 				name, okName := key.(string)
 
-				// converting cstring to string
-				nameBytes := []byte(name)
-				name = string(nameBytes[:clen(nameBytes)])
-
 				if okName {
+					// converting cstring to string
+					nameBytes := []byte(name)
+					name = string(nameBytes[:clen(nameBytes)])
+
 					if series, ok := seriesToWatch[name]; ok {
 						pointsList, okPointsList := element.([]interface{})
 						if okPointsList {
