@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/binary"
 	"log"
+	"regexp"
 	"time"
 
 	enodolib "github.com/SiriDB/siridb-enodo-go-lib"
@@ -18,16 +19,28 @@ func sendSeriesUpdate(seriesAndCounts map[string]int) {
 	}
 }
 
+func sendNewSeriesFoundForGroup(seriesName string, groupName string) {
+	data := make(map[string]string)
+	data["group"] = groupName
+	data["series_name"] = seriesName
+	bdata, err := qpack.Pack(data)
+	log.Println("SENDING FOUND SERIES FOR GROUP")
+	if err == nil {
+		pkg := enodolib.CreatePackage(1, enodolib.LISTENER_ADD_SERIES, bdata)
+		hubConn.Write(pkg)
+	}
+}
+
 func checkUpdates() {
 	for {
 		timer := time.After(time.Second * 60)
 		<-timer
+		updateLock.Lock()
 		if len(seriesCountUpdate) > 0 {
-			updateLock.Lock()
 			sendSeriesUpdate(seriesCountUpdate)
 			seriesCountUpdate = make(map[string]int)
-			updateLock.Unlock()
 		}
+		updateLock.Unlock()
 	}
 }
 
@@ -61,6 +74,8 @@ func watchIncommingData() {
 
 	dataBuf := enodolib.NewBuffer()
 	dataBuf.SetConn(hubConn)
+	log.Println("hubConn")
+	log.Println(hubConn)
 	pkgCh := dataBuf.GetPkgChan()
 	go dataBuf.ReadToBuffer(enodolib.PACKET_HEADER_LEN, gds)
 	for {
@@ -91,6 +106,7 @@ func watchIncommingData() {
 					continue
 				}
 				seriesToWatch = make(map[string]SeriesConfig)
+				groupsToWatch = make(map[string]GroupConfig)
 				for _, s := range listSlice {
 					unboxed, ok := s.(map[interface{}]interface{})
 					if !ok {
@@ -100,12 +116,24 @@ func watchIncommingData() {
 					name, okName := unboxed["name"].(string)
 					isRealtime, okIsRealtime := unboxed["realtime"].(bool)
 					isGroup, okIsGroup := unboxed["isGroup"].(bool)
-					if okName && okIsRealtime && okIsGroup {
-						sc := SeriesConfig{name, isRealtime, isGroup}
-						seriesToWatch[name] = sc
+					if okName && okIsRealtime {
+						if okIsGroup && isGroup {
+							selector, okSelector := unboxed["selector"].(string)
+							if okSelector {
+								regex, err := regexp.Compile(selector)
+								if err == nil {
+									gc := GroupConfig{name, regex}
+									groupsToWatch[name] = gc
+								}
+							}
+						} else {
+							sc := SeriesConfig{name, isRealtime}
+							seriesToWatch[name] = sc
+						}
 					}
 				}
 				log.Println("SERIES TO WATCH: ", seriesToWatch)
+				log.Println("GROUPS TO WATCH: ", groupsToWatch)
 			}
 		}
 	}

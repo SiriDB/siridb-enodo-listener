@@ -61,7 +61,7 @@ func readFromPipe() {
 				if okName {
 					// converting cstring to string
 					nameBytes := []byte(name)
-					name = string(nameBytes[:clen(nameBytes)])
+					name = string(nameBytes[:len(nameBytes)-1])
 
 					if series, ok := seriesToWatch[name]; ok {
 						pointsList, okPointsList := element.([]interface{})
@@ -79,6 +79,12 @@ func readFromPipe() {
 									seriesCountUpdate[name] = len(pointsList)
 								}
 								updateLock.Unlock()
+							}
+						}
+					} else {
+						for _, groupConfig := range groupsToWatch {
+							if found := groupConfig.Regex.MatchString(name); found {
+								sendNewSeriesFoundForGroup(name, groupConfig.Name)
 							}
 						}
 					}
