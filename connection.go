@@ -6,7 +6,6 @@ import (
 	"regexp"
 	"time"
 
-	enodolib "github.com/SiriDB/siridb-enodo-go-lib"
 	qpack "github.com/transceptor-technology/go-qpack"
 )
 
@@ -14,7 +13,7 @@ func sendSeriesUpdate(seriesAndCounts map[string]int) {
 	bdata, err := qpack.Pack(seriesAndCounts)
 	log.Println("SENDING UPDATE")
 	if err == nil {
-		pkg := enodolib.CreatePackage(1, enodolib.LISTENER_NEW_SERIES_POINTS, bdata)
+		pkg := CreatePackage(1, LISTENER_NEW_SERIES_POINTS, bdata)
 		hubConn.Write(pkg)
 	}
 }
@@ -26,7 +25,7 @@ func sendNewSeriesFoundForGroup(seriesName string, groupName string) {
 	bdata, err := qpack.Pack(data)
 	log.Println("SENDING FOUND SERIES FOR GROUP")
 	if err == nil {
-		pkg := enodolib.CreatePackage(1, enodolib.LISTENER_ADD_SERIES, bdata)
+		pkg := CreatePackage(1, LISTENER_ADD_SERIES, bdata)
 		hubConn.Write(pkg)
 	}
 }
@@ -50,7 +49,7 @@ func heartbeat() {
 		<-timer
 		data, err := qpack.Pack(enodoId)
 		if err == nil {
-			pkg := enodolib.CreatePackage(1, enodolib.HEARTBEAT, data)
+			pkg := CreatePackage(1, HEARTBEAT, data)
 			hubConn.Write(pkg)
 			log.Println("Send heartbeat to hub")
 		}
@@ -62,39 +61,38 @@ func handshake() {
 	bdata, err := qpack.Pack(data)
 
 	if err == nil {
-		pkg := enodolib.CreatePackage(1, enodolib.HANDSHAKE, bdata)
+		pkg := CreatePackage(1, HANDSHAKE, bdata)
 		hubConn.Write(pkg)
 	}
 }
 
 func watchIncommingData() {
-	var gds = func(data []byte) (uint32, error) {
-		return uint32(binary.BigEndian.Uint32(data[0:4])), nil
+	var gds = func(data []byte) (int, error) {
+		return int(binary.BigEndian.Uint32(data[0:4])), nil
 	}
-
-	dataBuf := enodolib.NewBuffer()
+	pkgCh := make(chan *pkg)
+	dataBuf := NewBuffer()
 	dataBuf.SetConn(hubConn)
-	log.Println("hubConn")
-	log.Println(hubConn)
-	pkgCh := dataBuf.GetPkgChan()
-	go dataBuf.ReadToBuffer(enodolib.PACKET_HEADER_LEN, gds)
+	dataBuf.SetPkgChan(pkgCh)
+
+	go dataBuf.ReadToBuffer(PACKET_HEADER_LEN, gds)
 	for {
 		data := <-pkgCh
 		packageDataBuf := data.GetData()
-		_, packageType, _ := enodolib.ReadHeaderFromBinaryData(data.GetHeader())
+		_, packageType, _ := ReadHeaderFromBinaryData(data.GetHeader())
 
 		switch packageType {
-		case enodolib.HANDSHAKE_OK:
+		case HANDSHAKE_OK:
 			log.Println("Hands shaked with Hub")
-		case enodolib.HANDSHAKE_FAIL:
+		case HANDSHAKE_FAIL:
 			log.Println("Hub does not want to shake hands")
-		case enodolib.HEARTBEAT:
+		case HEARTBEAT:
 			log.Println("Heartbeat back from Hub")
-		case enodolib.RESPONSE_OK:
+		case RESPONSE_OK:
 			log.Println("Hub received update correctly")
-		case enodolib.UNKNOWN_CLIENT:
+		case UNKNOWN_CLIENT:
 			log.Println("Hub does not recognize us")
-		case enodolib.UPDATE_SERIES:
+		case UPDATE_SERIES:
 			log.Println("Received new list of series to watch")
 
 			newSeriesToWatch, err := qpack.Unpack(packageDataBuf, 0)

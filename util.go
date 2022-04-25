@@ -1,16 +1,12 @@
 package main
 
-import enodolib "github.com/SiriDB/siridb-enodo-go-lib"
+import (
+	"strings"
 
-func getEnodoId() {
-	enodoId = enodolib.GenerateEnodoId()
-}
+	"github.com/google/uuid"
+)
 
-func clen(n []byte) int {
-	for i := 0; i < len(n); i++ {
-		if n[i] == 0 {
-			return i
-		}
-	}
-	return len(n)
+func generateEnodoId() {
+	uuidWithHyphen := uuid.New()
+	enodoId = strings.Replace(uuidWithHyphen.String(), "-", "", -1)
 }
