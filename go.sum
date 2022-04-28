@@ -1,5 +1,3 @@
-github.com/SiriDB/siridb-enodo-go-lib v0.1.1 h1:odVoF5WKQadbEuSwfALw3CWV9TAlrnNQtV/uydy+I8M=
-github.com/SiriDB/siridb-enodo-go-lib v0.1.1/go.mod h1:9h6UVW8xcgF6upu+D9AKtqImVibGR+JXYcK3ZiZoiyo=
 github.com/google/uuid v1.2.0 h1:qJYtXnJRWmpe7m/3XlyhrsLrEURqHRM2kxzoxXqyUDs=
 github.com/google/uuid v1.2.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/transceptor-technology/go-qpack v0.0.0-20190116123619-49a14b216a45 h1:9e+eZxnc06hqLXJMI0cC3ssk/tQ924UMfqn67Bl1j2o=
