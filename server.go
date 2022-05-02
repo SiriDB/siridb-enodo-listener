@@ -39,11 +39,7 @@ func handlePkg(pkgCh chan *pkg) {
 							sendSeriesUpdate(singleUpdate)
 						} else {
 							updateLock.Lock()
-							if _, ok := seriesCountUpdate[name]; ok {
-								seriesCountUpdate[name] += len(pointsList)
-							} else {
-								seriesCountUpdate[name] = len(pointsList)
-							}
+							seriesCountUpdate[name] += len(pointsList)
 							updateLock.Unlock()
 						}
 					}

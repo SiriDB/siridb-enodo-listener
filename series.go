@@ -22,7 +22,7 @@ type GroupConfig struct {
 // 	Set(key string, group GroupConfig)
 // }
 
-type SeriesCount interface {
-	Get(key string) int
-	Set(key string, count int)
-}
+// type SeriesCount interface {
+// 	Get(key string) int
+// 	Set(key string, count int)
+// }

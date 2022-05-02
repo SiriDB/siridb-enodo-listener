@@ -11,10 +11,15 @@ import (
 
 func sendSeriesUpdate(seriesAndCounts map[string]int) {
 	bdata, err := qpack.Pack(seriesAndCounts)
-	log.Println("SENDING UPDATE")
 	if err == nil {
 		pkg := CreatePackage(1, LISTENER_NEW_SERIES_POINTS, bdata)
-		hubConn.Write(pkg)
+		if _, err = hubConn.Write(pkg); err != nil {
+			log.Println("Failed to write 'series update' pacakge")
+		} else {
+			log.Println("Send 'series update' pacakge")
+		}
+	} else {
+		log.Println("Failed to pack 'series update' data")
 	}
 }
 
@@ -23,10 +28,15 @@ func sendNewSeriesFoundForGroup(seriesName string, groupName string) {
 	data["group"] = groupName
 	data["series_name"] = seriesName
 	bdata, err := qpack.Pack(data)
-	log.Println("SENDING FOUND SERIES FOR GROUP")
 	if err == nil {
 		pkg := CreatePackage(1, LISTENER_ADD_SERIES, bdata)
-		hubConn.Write(pkg)
+		if _, err = hubConn.Write(pkg); err != nil {
+			log.Println("Failed to write 'found series for group' pacakge")
+		} else {
+			log.Println("Send 'found series for group' pacakge")
+		}
+	} else {
+		log.Println("Failed to pack 'found series for group' data")
 	}
 }
 
@@ -50,8 +60,13 @@ func heartbeat() {
 		data, err := qpack.Pack(enodoId)
 		if err == nil {
 			pkg := CreatePackage(1, HEARTBEAT, data)
-			hubConn.Write(pkg)
-			log.Println("Send heartbeat to hub")
+			if _, err = hubConn.Write(pkg); err != nil {
+				log.Println("Failed to write 'heartbeat' pacakge")
+			} else {
+				log.Println("Send heartbeat to hub")
+			}
+		} else {
+			log.Println("Failed to pack 'heartbeat' data")
 		}
 	}
 }
@@ -62,7 +77,13 @@ func handshake() {
 
 	if err == nil {
 		pkg := CreatePackage(1, HANDSHAKE, bdata)
-		hubConn.Write(pkg)
+		if _, err = hubConn.Write(pkg); err != nil {
+			log.Println("Failed to write 'handshake' pacakge")
+		} else {
+			log.Println("Send handshake package")
+		}
+	} else {
+		log.Println("Failed to pack 'package' data")
 	}
 }
 

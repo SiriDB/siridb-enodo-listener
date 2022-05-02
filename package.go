@@ -10,21 +10,21 @@ const (
 	HANDSHAKE_FAIL             = 3
 	UNKNOWN_CLIENT             = 4
 	HEARTBEAT                  = 5
-	SHUTDOWN                   = 6
-	CLIENT_SHUTDOWN            = 7
-	ADD_SERIES                 = 8
-	REMOVE_SERIES              = 9
+	_                          = 6 // SHUTDOWN
+	_                          = 7 // CLIENT_SHUTDOWN
+	_                          = 8 // ADD_SERIES
+	_                          = 9 // REMOVE_SERIES
 	LISTENER_ADD_SERIES        = 10
-	LISTENER_REMOVE_SERIES     = 11
+	_                          = 11 // LISTENER_REMOVE_SERIES
 	LISTENER_NEW_SERIES_POINTS = 12
 	UPDATE_SERIES              = 13
 	RESPONSE_OK                = 14
-	WORKER_JOB                 = 15
-	WORKER_JOB_RESULT          = 16
-	WORKER_JOB_CANCEL          = 21
-	WORKER_JOB_CANCELLED       = 22
-	WORKER_UPDATE_BUSY         = 23
-	WORKER_REFUSED             = 24
+	_                          = 15 // WORKER_JOB
+	_                          = 16 // WORKER_JOB_RESULT
+	_                          = 21 // WORKER_JOB_CANCEL
+	_                          = 22 // WORKER_JOB_CANCELLED
+	_                          = 23 // WORKER_UPDATE_BUSY
+	_                          = 24 // WORKER_REFUSED
 )
 
 const PACKET_HEADER_LEN = 6 // bytes
