@@ -29,7 +29,6 @@ func handlePkg(pkgCh chan *pkg) {
 				// converting cstring to string
 				nameBytes := []byte(name)
 				name = string(nameBytes[:len(nameBytes)-1])
-				log.Println(name)
 				if series, ok := seriesToWatch[name]; ok {
 					pointsList, okPointsList := element.([]interface{})
 					if okPointsList {
