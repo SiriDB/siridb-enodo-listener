@@ -1,6 +1,9 @@
 # The base go-image
 FROM golang:1.18-alpine
 
+# Install Git
+RUN apk add git
+
 # Create a directory for the app
 RUN mkdir /app
 
