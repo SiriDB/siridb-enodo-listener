@@ -72,7 +72,13 @@ func heartbeat() {
 }
 
 func handshake() {
-	data := map[string]interface{}{"client_id": enodoId, "client_type": "listener", "token": internal_security_token, "version": "0.0.1"}
+	data := map[string]interface{}{
+		"client_id":   enodoId,
+		"client_type": "listener",
+		"token":       internal_security_token,
+		"version":     Version
+	}
+
 	bdata, err := qpack.Pack(data)
 
 	if err == nil {
