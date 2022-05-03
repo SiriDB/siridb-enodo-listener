@@ -76,7 +76,7 @@ func handshake() {
 		"client_id":   enodoId,
 		"client_type": "listener",
 		"token":       internal_security_token,
-		"version":     Version
+		"version":     Version,
 	}
 
 	bdata, err := qpack.Pack(data)
