@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"time"
 
-	qpack "github.com/transceptor-technology/go-qpack"
+	qpack "github.com/cesbit/go-qpack"
 )
 
 func sendSeriesUpdate(seriesAndCounts map[string]int) {

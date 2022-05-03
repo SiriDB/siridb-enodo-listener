@@ -6,7 +6,7 @@ import (
 	"log"
 	"net"
 
-	qpack "github.com/transceptor-technology/go-qpack"
+	qpack "github.com/cesbit/go-qpack"
 )
 
 func handlePkg(pkgCh chan *pkg) {

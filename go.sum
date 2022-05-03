@@ -1,4 +1,4 @@
+github.com/cesbit/go-qpack v1.0.3 h1:5Id2b27hRZ6ZtPl1NUOFt/wLd3y8i0llMN5yKMQ0nfE=
+github.com/cesbit/go-qpack v1.0.3/go.mod h1:TDaZo/JOd9pzmzLeDD7e5FNlfqSSjTTuwBa3JKu98ik=
 github.com/google/uuid v1.2.0 h1:qJYtXnJRWmpe7m/3XlyhrsLrEURqHRM2kxzoxXqyUDs=
 github.com/google/uuid v1.2.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/transceptor-technology/go-qpack v0.0.0-20190116123619-49a14b216a45 h1:9e+eZxnc06hqLXJMI0cC3ssk/tQ924UMfqn67Bl1j2o=
-github.com/transceptor-technology/go-qpack v0.0.0-20190116123619-49a14b216a45/go.mod h1:7QhRKvAhSRfXDqhw+JG0vw3o7igpbPDGka/q1yQwo6o=
