@@ -105,10 +105,16 @@ func httpReadyWebserver(webserverPort string) {
 	http.HandleFunc("/ready", func(w http.ResponseWriter, r *http.Request) {
 		if connectedToHub {
 			w.WriteHeader(200)
-			w.Write([]byte("ok"))
+			_, err := w.Write([]byte("ok"))
+			if err != nil {
+				log.Println("Could not write response to webserver client")
+			}
 		} else {
 			w.WriteHeader(500)
-			w.Write([]byte("Not connected to Hub"))
+			_, err := w.Write([]byte("Not connected to Hub"))
+			if err != nil {
+				log.Println("Could not write response to webserver client")
+			}
 		}
 	})
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", webserverPort), nil))
