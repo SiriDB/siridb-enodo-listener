@@ -20,7 +20,7 @@ var updateLock sync.RWMutex = sync.RWMutex{}
 
 var hubHost = os.Getenv("ENODO_HUB_HOSTNAME")
 var hubPort = os.Getenv("ENODO_HUB_PORT")
-var tcpPort = os.Getenv("ENODO_TCP_PORT")
+var udpPort = os.Getenv("ENODO_UDP_PORT")
 var webserverPort = os.Getenv("ENODO_READY_PORT")
 var internal_security_token = os.Getenv("ENODO_INTERNAL_SECURITY_TOKEN")
 

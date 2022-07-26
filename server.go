@@ -2,9 +2,9 @@ package main
 
 import (
 	"encoding/binary"
-	"fmt"
 	"log"
 	"net"
+	"strconv"
 
 	qpack "github.com/cesbit/go-qpack"
 )
@@ -62,23 +62,28 @@ func readFromTcp() {
 		return dataSize, nil
 	}
 
-	log.Printf("Starting listening on TCP port %s\n", tcpPort)
 	pkgCh := make(chan *pkg)
 
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", tcpPort))
+	port, err := strconv.Atoi(udpPort)
+
+	if err != nil {
+		log.Fatal("Incorrect port")
+	}
+
+	conn, err := net.ListenUDP("udp", &net.UDPAddr{
+		Port: port,
+		IP:   net.ParseIP("0.0.0.0"),
+	})
 	if err != nil {
 		log.Fatal("Listen error: ", err)
 	}
 
+	defer conn.Close()
+	log.Printf("Starting listening on UDP port %s\n", udpPort)
+
 	go handlePkg(pkgCh)
 
 	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			log.Println("Accept Error", err)
-			continue
-		}
-
 		buf := NewBuffer()
 		buf.SetConn(conn)
 		buf.SetPkgChan(pkgCh)
