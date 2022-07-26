@@ -13,4 +13,5 @@ Variable                      | Description
 ENODO_HUB_HOSTNAME            | Hostname/FQDN or IP address of the Enodo Hub, for example: enodohub
 ENODO_HUB_PORT                | Connect to the Enodo Hub on this TCP port, for example: 9103.
 ENODO_TCP_PORT                | Listen to this TCP port, for example: 9104.
+ENODO_READY_PORT              | Listen to this TCP port, for example: 8082, to server /ready endpoint.
 ENODO_INTERNAL_SECURITY_TOKEN | (Optional) Security Token for connecting to the Hub.

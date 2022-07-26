@@ -43,6 +43,7 @@ func (buf buffer) ReadToBuffer(headerSize int, getDataSize func([]byte) (int, er
 		n, err := buf.conn.Read(wbuf)
 		if err != nil {
 			log.Println("Closing connection ", buf.conn.RemoteAddr())
+			connectedToHub = false
 			return
 		}
 		buf.len += n

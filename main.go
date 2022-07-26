@@ -1,14 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
-	"time"
 )
 
 var hubConn net.Conn
@@ -23,6 +21,7 @@ var updateLock sync.RWMutex = sync.RWMutex{}
 var hubHost = os.Getenv("ENODO_HUB_HOSTNAME")
 var hubPort = os.Getenv("ENODO_HUB_PORT")
 var tcpPort = os.Getenv("ENODO_TCP_PORT")
+var webserverPort = os.Getenv("ENODO_READY_PORT")
 var internal_security_token = os.Getenv("ENODO_INTERNAL_SECURITY_TOKEN")
 
 func main() {
@@ -36,22 +35,12 @@ func main() {
 		os.Exit(0)
 	}(sigc)
 
-	for {
-		hubConn, connErr = net.Dial("tcp", fmt.Sprintf("%s:%s", hubHost, hubPort))
-		if connErr == nil {
-			log.Println("Connection made to Hub")
-			var wg sync.WaitGroup
-			wg.Add(4)
-			go watchIncommingData()
-			go handshake()
-			go heartbeat()
-			go readFromTcp()
-			go checkUpdates()
-			wg.Wait()
-		} else {
-			log.Println(connErr)
-		}
-		timer := time.After(time.Second * 10)
-		<-timer
-	}
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go httpReadyWebserver(webserverPort)
+	go setupHubConn(hubHost, hubPort)
+	go readFromTcp()
+
+	wg.Wait()
 }

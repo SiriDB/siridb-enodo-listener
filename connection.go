@@ -2,12 +2,18 @@ package main
 
 import (
 	"encoding/binary"
+	"fmt"
 	"log"
+	"net"
+	"net/http"
 	"regexp"
+	"sync"
 	"time"
 
 	qpack "github.com/cesbit/go-qpack"
 )
+
+var connectedToHub = false
 
 func sendSeriesUpdate(seriesAndCounts map[string]int) {
 	bdata, err := qpack.Pack(seriesAndCounts)
@@ -53,7 +59,7 @@ func checkUpdates() {
 	}
 }
 
-func heartbeat() {
+func heartbeat(wg *sync.WaitGroup) {
 	for {
 		timer := time.After(time.Second * 25)
 		<-timer
@@ -61,7 +67,9 @@ func heartbeat() {
 		if err == nil {
 			pkg := CreatePackage(1, HEARTBEAT, data)
 			if _, err = hubConn.Write(pkg); err != nil {
-				log.Println("Failed to write 'heartbeat' pacakge")
+				log.Println("Failed to write 'heartbeat' package")
+				wg.Done()
+				return
 			} else {
 				log.Println("Send heartbeat to hub")
 			}
@@ -90,6 +98,45 @@ func handshake() {
 		}
 	} else {
 		log.Println("Failed to pack 'package' data")
+	}
+}
+
+func httpReadyWebserver(webserverPort string) {
+	http.HandleFunc("/ready", func(w http.ResponseWriter, r *http.Request) {
+		if connectedToHub {
+			w.WriteHeader(200)
+			w.Write([]byte("ok"))
+		} else {
+			w.WriteHeader(500)
+			w.Write([]byte("Not connected to Hub"))
+		}
+	})
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", webserverPort), nil))
+}
+
+func setupHubConn(hubHost string, hubPort string) {
+	for {
+		hubConn, connErr = net.Dial("tcp", fmt.Sprintf("%s:%s", hubHost, hubPort))
+		if connErr == nil {
+			log.Println("Connection made to Hub")
+			connectedToHub = true
+			var wg sync.WaitGroup
+			wg.Add(1)
+			go watchIncommingData()
+			go handshake()
+			go heartbeat(&wg)
+			go checkUpdates()
+			wg.Wait()
+		} else {
+			log.Println(connErr)
+		}
+		if hubConn != nil {
+			hubConn.Close()
+		}
+		connectedToHub = false
+		timer := time.After(time.Second * 10)
+		<-timer
+		log.Println("Trying to reconnect")
 	}
 }
 
