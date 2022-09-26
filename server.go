@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/binary"
 	"log"
 	"net"
 	"strconv"
@@ -54,13 +53,8 @@ func handlePkg(pkgCh chan *pkg) {
 	}
 }
 
-func readFromTcp() {
+func readFromUdp() {
 	const headerSize = 8
-
-	var gds = func(data []byte) (int, error) {
-		dataSize := int(binary.LittleEndian.Uint32(data[0:4]))
-		return dataSize, nil
-	}
 
 	pkgCh := make(chan *pkg)
 
@@ -83,13 +77,9 @@ func readFromTcp() {
 
 	go handlePkg(pkgCh)
 
-	for {
-		buf := NewBuffer()
-		buf.SetConn(conn)
-		buf.SetPkgChan(pkgCh)
+	buf := NewUdpBuffer()
+	buf.SetConn(conn)
+	buf.SetPkgChan(pkgCh)
 
-		go buf.ReadToBuffer(headerSize, gds)
-
-		log.Println("Accepted ", conn.RemoteAddr())
-	}
+	go buf.Read()
 }
