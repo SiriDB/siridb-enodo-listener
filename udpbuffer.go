@@ -11,7 +11,7 @@ const MAX_PER_SERVER = 100
 type udpBuffer struct {
 	conn      *net.UDPConn
 	collector map[int]*collect
-	pkgCh     chan *pkg
+	dataCh    chan []byte
 }
 
 // newBuffer retur a pointer to a new buffer.
@@ -19,7 +19,7 @@ func NewUdpBuffer() *udpBuffer {
 	return &udpBuffer{
 		conn:      nil,
 		collector: make(map[int]*collect),
-		pkgCh:     make(chan *pkg),
+		dataCh:    make(chan []byte),
 	}
 }
 
@@ -27,8 +27,8 @@ func (buf *udpBuffer) SetConn(c *net.UDPConn) {
 	buf.conn = c
 }
 
-func (buf *udpBuffer) SetPkgChan(pkgCh chan *pkg) {
-	buf.pkgCh = pkgCh
+func (buf *udpBuffer) SetDataChan(dataCh chan []byte) {
+	buf.dataCh = dataCh
 }
 
 func (buf udpBuffer) Read() {
@@ -56,8 +56,7 @@ func (buf udpBuffer) Read() {
 		collector.SetPart(seq_id, rbuf[8:n])
 		if collector.IsComplete() {
 			data := collector.GetData()
-			pkg := &pkg{data[0:8], data[8:]}
-			buf.pkgCh <- pkg
+			buf.dataCh <- data
 			delete(buf.collector, key)
 		}
 	}

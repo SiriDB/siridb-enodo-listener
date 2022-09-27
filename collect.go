@@ -1,6 +1,8 @@
 package main
 
-import "bytes"
+import (
+	"bytes"
+)
 
 type collect struct {
 	data   [][]byte
@@ -21,7 +23,9 @@ func (c *collect) Size() int {
 }
 
 func (c *collect) SetPart(seq_id int, part []byte) {
-	c.data[seq_id] = part
+	dst := make([]byte, len(part))
+	copy(dst, part)
+	c.data[seq_id] = dst
 	c.count += 1
 }
 
@@ -30,6 +34,7 @@ func (c *collect) IsComplete() bool {
 }
 
 func (c *collect) GetData() []byte {
-	sep := []byte("")
-	return bytes.Join(c.data, sep)
+	sep := make([]byte, 0)
+	raw := bytes.Join(c.data, sep)
+	return raw
 }

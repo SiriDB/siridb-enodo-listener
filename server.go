@@ -8,12 +8,11 @@ import (
 	qpack "github.com/cesbit/go-qpack"
 )
 
-func handlePkg(pkgCh chan *pkg) {
+func handleData(dataCh chan []byte) {
 	for {
-		data := <-pkgCh
-		packageDataBuf := data.GetData()
+		data := <-dataCh
 
-		unpacked, _ := qpack.Unpack(packageDataBuf, 0)
+		unpacked, _ := qpack.Unpack(data, 0)
 		unboxed, ok := unpacked.(map[interface{}]interface{})
 
 		if !ok {
@@ -25,9 +24,7 @@ func handlePkg(pkgCh chan *pkg) {
 			name, okName := key.(string)
 
 			if okName {
-				// converting cstring to string
-				nameBytes := []byte(name)
-				name = string(nameBytes[:len(nameBytes)-1])
+				name = name[:len(name)-1]
 				if series, ok := seriesToWatch[name]; ok {
 					pointsList, okPointsList := element.([]interface{})
 					if okPointsList {
@@ -56,7 +53,7 @@ func handlePkg(pkgCh chan *pkg) {
 func readFromUdp() {
 	const headerSize = 8
 
-	pkgCh := make(chan *pkg)
+	dataCh := make(chan []byte)
 
 	port, err := strconv.Atoi(udpPort)
 
@@ -72,14 +69,13 @@ func readFromUdp() {
 		log.Fatal("Listen error: ", err)
 	}
 
-	defer conn.Close()
 	log.Printf("Starting listening on UDP port %s\n", udpPort)
 
-	go handlePkg(pkgCh)
+	go handleData(dataCh)
 
 	buf := NewUdpBuffer()
 	buf.SetConn(conn)
-	buf.SetPkgChan(pkgCh)
+	buf.SetDataChan(dataCh)
 
 	go buf.Read()
 }
