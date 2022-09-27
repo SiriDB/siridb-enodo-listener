@@ -25,6 +25,8 @@ var webserverPort = os.Getenv("ENODO_READY_PORT")
 var internal_security_token = os.Getenv("ENODO_INTERNAL_SECURITY_TOKEN")
 
 func main() {
+	log.Printf("Version %s", Version)
+
 	generateEnodoId()
 
 	sigc := make(chan os.Signal, 1)
@@ -40,7 +42,7 @@ func main() {
 
 	go httpReadyWebserver(webserverPort)
 	go setupHubConn(hubHost, hubPort)
-	go readFromTcp()
+	go readFromUdp()
 
 	wg.Wait()
 }

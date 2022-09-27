@@ -2,14 +2,15 @@ package main
 
 import (
 	"encoding/binary"
-	"log"
 	"net"
 )
+
+const MAX_PER_SERVER = 100
 
 // buffer is used to read data from a connection.
 type udpBuffer struct {
 	conn      *net.UDPConn
-	collector map[int]collect
+	collector map[int]*collect
 	pkgCh     chan *pkg
 }
 
@@ -17,7 +18,7 @@ type udpBuffer struct {
 func NewUdpBuffer() *udpBuffer {
 	return &udpBuffer{
 		conn:      nil,
-		collector: make(map[int][][]byte),
+		collector: make(map[int]*collect),
 		pkgCh:     make(chan *pkg),
 	}
 }
@@ -35,7 +36,7 @@ func (buf udpBuffer) Read() {
 
 	rbuf := make([]byte, 508)
 	for {
-		n, remote, err := buf.conn.ReadFromUDP(rbuf)
+		n, _, err := buf.conn.ReadFromUDP(rbuf)
 		if err != nil {
 			continue
 		}
@@ -44,39 +45,20 @@ func (buf udpBuffer) Read() {
 		pkg_id := int(binary.LittleEndian.Uint16(rbuf[2:4]))
 		seq_sz := int(binary.LittleEndian.Uint16(rbuf[4:6]))
 		seq_id := int(binary.LittleEndian.Uint16(rbuf[6:8]))
-		key := (id << 16) + (pkg_id % 100)
+		key := (id << 16) + (pkg_id % MAX_PER_SERVER)
 
 		collector, exists := buf.collector[key]
-		if (exists) {
-			collector.
+		if !exists || collector.pkg_id != pkg_id || collector.Size() != seq_sz {
+			collector = NewCollect(seq_sz, pkg_id)
+			buf.collector[key] = collector
 		}
 
-		buf.len += n
-		buf.data = append(buf.data, wbuf[:n]...)
-		for buf.len >= 8 {
-
-			if buf.pkg == nil {
-				buf.dataSize, err = getDataSize(buf.data)
-				if err != nil {
-					log.Println("Failed reading data size from ", remote)
-					return
-				}
-				buf.pkg = &pkg{make([]byte, headerSize), make([]byte, buf.dataSize)}
-			}
-			total := buf.dataSize + headerSize
-
-			if buf.len < total {
-				break
-			}
-
-			buf.pkg.header = buf.data[0:headerSize]
-			buf.pkg.data = buf.data[headerSize:total]
-
-			buf.pkgCh <- buf.pkg
-
-			buf.data = buf.data[total:]
-			buf.len -= total
-			buf.pkg = nil
+		collector.SetPart(seq_id, rbuf[8:n])
+		if collector.IsComplete() {
+			data := collector.GetData()
+			pkg := &pkg{data[0:8], data[8:]}
+			buf.pkgCh <- pkg
+			delete(buf.collector, key)
 		}
 	}
 }
