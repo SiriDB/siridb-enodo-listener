@@ -2,7 +2,7 @@ repo_name: SiriDB/siridb-enodo-listener
 report_id: f131599743a00337cbfb43917402c91a
 version: 0.1
 repo_type: Public
-timestamp: '2023-12-27T20:00:50+00:00'
+timestamp: '2024-01-05T08:34:54+00:00'
 requested_by: timoj
 provider: github
 branch: master
@@ -18,6 +18,7 @@ tools:
   category: Languages & Frameworks
   sub_category: Languages
   image_url: https://img.stackshare.io/service/1005/O6AczwfV_400x400.png
+  detection_source_url: https://github.com/SiriDB/siridb-enodo-listener
   detection_source: Repo Metadata
 - name: Python
   description: A clear and powerful object-oriented programming language, comparable
@@ -28,6 +29,7 @@ tools:
   category: Languages & Frameworks
   sub_category: Languages
   image_url: https://img.stackshare.io/service/993/pUBY5pVj.png
+  detection_source_url: https://github.com/SiriDB/siridb-enodo-listener
   detection_source: Repo Metadata
 - name: Docker
   description: Enterprise Container Platform for High-Velocity Innovation.
@@ -38,6 +40,7 @@ tools:
   category: Build, Test, Deploy
   sub_category: Virtual Machine Platforms & Containers
   image_url: https://img.stackshare.io/service/586/n4u37v9t_400x400.png
+  detection_source_url: https://github.com/SiriDB/siridb-enodo-listener
   detection_source: Repo Metadata
 - name: Git
   description: Fast, scalable, distributed revision control system
@@ -47,6 +50,7 @@ tools:
   category: Build, Test, Deploy
   sub_category: Version Control System
   image_url: https://img.stackshare.io/service/1046/git.png
+  detection_source_url: https://github.com/SiriDB/siridb-enodo-listener
   detection_source: Repo Metadata
 - name: GitHub Actions
   description: Automate your workflow from idea to production
@@ -56,6 +60,7 @@ tools:
   category: Build, Test, Deploy
   sub_category: Continuous Integration
   image_url: https://img.stackshare.io/service/11563/actions.png
+  detection_source_url: https://github.com/SiriDB/siridb-enodo-listener/blob/master/.github/workflows/deploy.yml
   detection_source: ".github/workflows/deploy.yml"
   last_updated_by: Jeroen van der Heijden
   last_updated_on: 2022-05-03 10:35:05.000000000 Z
